@@ -269,39 +269,31 @@
 ***** AH | AL -> 8-Bit
 
 
-*** The Stack
+*** System Calls
 
-**** Low Addresses    --------------------------
+**** System calls are instruction that tells the system kernel to perform tasks
 
-****                 |   Empty                   |
+**** [[https://x86.syscall.sh/]]
 
-****                  --------------------------
+***** To write to stdin
+#+BEGIN_SRC asm
+global _start
 
-**** ^               | Local Variables           | <-- esp points here
+section .data   ; Global variables are defined in this section, also known as the Data Segment
+  msg db "Hello world",0xa
+  len equ $ - msg
 
-**** | ebp-x         |                           |
-
-****                  --------------------------
-
-**** | ebp+x         | Saved EBP                 | <-- ebp points here
-
-**** ˅                --------------------------
-
-****                 | Return Pointer            |
-
-****                  -------------------------
-
-****                 | Parameters                |
-
-****                   -------------------------
-
-****                 | Parents Functions's data  |
-
-****                  -------------------------
-
-****                 |                           |
-
-**** High Address     -------------------------
+section .text   ; Code is executed in this section, also known as the Code Segment
+_start:
+  mov eax, 4    ; Specifies the "write" syscall
+  mov ebx, 0    ; Specifies the status code of the operation. Should be 0 unless there's an error
+  mov ecx, msg  ; Moves the "msg" char buffer into the ecx register
+  mov edx, len  ; Moves the length of "msg", "len", into the edx register
+  int 0x80      ; Invokes the syscall
+  mov eax, 1    ; Specifies the "system_exit" syscall
+  mov ebx, 0    ; Specifies the status code of the operation
+  int 0x80      ; Invokes the syscall
+#+END_SRC
 
 *** Operands
 #+BEGIN_SRC asm
@@ -313,13 +305,16 @@
   div edx	; eax /= edx
 #+END_SRC
 
+* Youtube Exercises [[https://www.youtube.com/watch?v=wLXIWKUWpSs&t=620s]]
+
 ** Ex1
 #+BEGIN_SRC asm
 global _start  ; Entry point into program. Global keyword is used to make the identifier accessible to the linker
 
+section .text  ; Code is executed in this section, also known as the Code Segment
 _start:        ; Identifier followed by a colon will create a label. Labels are used to name locations in the code
-  mov eax, 1
-  mov ebx, 42
-  sub ebx, 29
-  int 0x80
+  mov eax, 1   ; Determines what type of syscall is made when interrupt handler is invoked, in this case sys_exit
+  mov ebx, 42  ; This value determines what exit status this call will have when the interrupt handler is invoked
+  sub ebx, 29  ; Simple usage of subtract instruction to subtract 29 from ebx register
+  int 0x80     ; system call interrupt handler, denoted by the instruction int, and value 0x80
 #+END_SRC
