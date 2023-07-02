@@ -1,0 +1,325 @@
+#+TITLE: x86 Assembly Notes
+#+AUTHOR: Jericho C. Gregory
+
+* Basics
+
+
+** x86 Instruction Set
+
+*** The Stack -> [[./stack.png]]
+
+*** Keyword Basics (Incomplete)
+#+BEGIN_SRC asm
+  mov eax, 1   ; mov -> Move value of integer 1 into eax register
+  int 0x80     ; int -> Interrupt handler, processor transfers control to interrupt handler. 80 or 0x80 is the syscall handler
+#+END_SRC
+
+
+*** Assembler Directives
+
+**** DB <byte>
+
+***** Define Byte. Reserves an explicit byte of memory at the current location. Initialized to <byte> value
+
+**** DW <word>
+
+***** Define Word. 2-Bytes
+
+**** DD <dword>
+
+***** Define DWord. 4-Bytes
+
+
+*** Operand Types
+
+**** Immediate
+
+***** A numberic operand, hard coded
+
+**** Register
+
+***** A gereral purpose register
+
+**** Memory
+
+***** Memory address w/brackets []
+
+
+*** Instructions
+
+**** add <destination>, <source>
+
+***** Adds <source> to <destination>, <destination> may be a register or memory. <source> may be a register, memory or immediate value
+
+**** call <location>
+
+***** Call a function and return to the next instruction when finished. <location> may be a relative offset from the current location, a register or memory address
+
+**** cmp <destination>, <source>
+
+***** Compare <source>, with <destination>, similar to sub instruction but does not modify the <destination> operand with the result of the subtraction
+
+**** dec <destination>
+
+***** Subtract 1 from <destination>, <destination> may be a register or memory
+
+**** div <divisor>
+
+***** Divide the edx:eax registers (64-bit combo) by <divisor>, <divisor> may be a register or memory
+
+**** inc <destination>
+
+***** Add 1 to <destination>, <destination> may be a register or memory
+
+**** je <location>
+
+***** Jump if Equal (zero flag=1, or ZF=1) to <location>
+
+**** jg <location>
+
+***** Jump if Greater (zero flag=0 and sign flag=overflow flag, or ZF=0 and SF=OF) to <location>
+
+**** jge <location>
+
+***** Jump if Greater or Equal (sign flag=overflow flag, or SF=OF) to <location>
+
+**** jle <location>
+
+***** Jump if Less or Equal (sign flag<>overflow flag, SF<>OF) to <location>
+
+**** jmp <location>
+
+***** Jump to <location>, Unconditional
+
+**** jne <location>
+
+***** Jump if Not Equal (zero flag=0, ZF=0) to <location>
+
+**** jnz <location>
+
+***** Jump if Not Zero (zero flag=0, ZF=0) to <location>
+
+**** jz <location>
+
+***** Jump if Zero (zero flag=1, ZF=1) to <location>
+
+**** lea <destination>, <source>
+
+***** Load Effective Address. Gets a pointer to the memory expression <source> and stores it in <destination>
+
+**** mov <destination>, <source>
+
+***** Move data from <source> to <destination>, <source> may be an immediate value, register or a memory address. <destination> may be either a memory address or a register or a memory address.
+
+***** Both <source> and <destination> may not be memory addresses
+
+**** mul <source>
+
+***** Multiply the edx:eax resgisters (64-bit combo) by <source>, <source> may be a register or memory
+
+**** pop <destination>
+
+***** Take a 21-bit value from the stack and store in <destination>, esp is incremented by 4. <destination> may be a register, including segment registers or memory
+
+**** push <value>
+
+***** Adds a 32-bit value to the top of the stack. Decremements esp by 4. <value> may be a register, segment resgister, memory or immediate value
+
+**** rol <destination>, <count>
+
+***** Bitwise Rotate Left the value in <destination> by <count> bits. <destination> may be a register or memory address. <count> may be immediate or CL register
+
+**** ror <destination>, <count>
+
+***** Bitwise Rotate Right the value in <destination> by <count> bits. <destination> may be a register or memory address. <count> may be immediate or CL register
+
+**** shl <destination>, <count>
+
+***** Bitwise Shift Left the value in <destination> by <count> bits. <destination> may be a register or memory address. <count> may be immediate or CL register
+
+**** shr <destination>, <count>
+
+***** Bitwise Shift Right the value in <destination> by <count> bits. <destination> may be a register or memory address. <count> may be immediate or CL register
+
+**** sub <destination>, <source>
+
+***** Subtract <source> from <destination>. <source> may be immediate, memory or a register. <destination> may be memory or a register
+
+***** (source = destination)->ZF=1
+
+***** (source > destination)->CF=1
+
+***** (source < destination)->CF=0 and ZF=0
+
+**** test <destination>, <source>
+
+***** Performs a logical OR operation but does not modify the value in the <destination> operand
+
+***** (source = destination)->ZF=1
+
+***** (source <> destination)->ZF=0
+
+**** xchg <destination>, <source>
+
+***** Exchange the contents of <source> and <destination>. Operands may be register or memory. Both operands may not be memory
+
+**** xor <destination>, <source>
+
+***** Bitwise XOR the value in <source> with the value in <destination>, storing the result in <destination>.
+
+***** <destination> may be register or memory address and <source> may be register, memory or immediate
+
+
+*** General Purpose 32-Bit Registers
+
+**** eax
+
+***** Contains the return value of a function call
+
+**** ebx
+
+***** General Purpose
+
+**** ecx
+
+***** Used as a loop counter, "this" pointer in C++
+
+**** edx
+
+***** General Purpose
+
+**** esi
+
+***** Source index pointer
+
+**** edi
+
+***** Destination index pointer
+
+**** esp
+
+***** Stack pointer
+
+**** ebp
+
+***** Stack base pointer
+
+*** Segment Registers
+
+**** CS
+
+***** Code segment
+
+**** SS
+
+***** Stack segment
+
+**** DS
+
+***** Data segment
+
+**** ES
+
+***** Extra data segment
+
+**** FS
+
+***** Points to Thread Information Block (TIB)
+
+**** GS
+
+***** Extra data segment
+
+
+*** Misc. Registers
+
+**** EIP
+
+***** Insutruction pointer
+
+**** EFLAGS
+
+***** Processor status flags
+
+*** Status Flags
+
+**** ZF
+
+***** Zero: Operation results in Zero
+
+**** CF
+
+***** Carry: source > destination in subtract
+
+**** SF
+
+***** Sign: Operation result in a negative number
+
+**** OF
+
+
+*** 16-Bit and 8-Bit registers
+
+**** The four primary general prupose registers (eax, ebx, ecx and edx) have 16 and 8 bit overlapping aliases
+
+*****    eax  -> 32-Bit
+
+*****    | AX -> 16-Bit
+
+***** AH | AL -> 8-Bit
+
+
+*** The Stack
+
+**** Low Addresses    --------------------------
+
+****                 |   Empty                   |
+
+****                  --------------------------
+
+**** ^               | Local Variables           | <-- esp points here
+
+**** | ebp-x         |                           |
+
+****                  --------------------------
+
+**** | ebp+x         | Saved EBP                 | <-- ebp points here
+
+**** ˅                --------------------------
+
+****                 | Return Pointer            |
+
+****                  -------------------------
+
+****                 | Parameters                |
+
+****                   -------------------------
+
+****                 | Parents Functions's data  |
+
+****                  -------------------------
+
+****                 |                           |
+
+**** High Address     -------------------------
+
+*** Operands
+#+BEGIN_SRC asm
+  mov ebx, 123  ; ebx = 123
+  mov eax, ebx  ; eax = ebx
+  add ebx, ecx  ; ebx += ecx
+  sub ebx, edx  ; ebx -= edx
+  mul ebx	; eax *= ebx
+  div edx	; eax /= edx
+#+END_SRC
+
+** Ex1
+#+BEGIN_SRC asm
+global _start  ; Entry point into program. Global keyword is used to make the identifier accessible to the linker
+
+_start:        ; Identifier followed by a colon will create a label. Labels are used to name locations in the code
+  mov eax, 1
+  mov ebx, 42
+  sub ebx, 29
+  int 0x80
+#+END_SRC
